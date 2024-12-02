@@ -1,18 +1,25 @@
 #!/bin/bash
 
+# S'assurer qu'aucune autre instance de apt ou apt-get n'est en cours d'exécution
+if sudo fuser /var/lib/dpkg/lock-frontend ; then
+  echo "Un autre processus utilise apt. Veuillez attendre qu'il se termine ou le terminer manuellement."
+  exit 1
+fi
+
 # Ajouter les dépôts nécessaires et mettre à jour la liste des paquets
 sudo apt-get update
 sudo apt-get upgrade -y
 
+# PostgreSQL 17
+echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" | sudo tee /etc/apt/sources.list.d/pgdg.list
+wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+sudo apt-get update
+sudo apt-get install -y postgresql-17
+
 # Reverse Engineering
-sudo apt-get install -y ghidra radare2 x64dbg cutter capstone
-# Installation manuelle de Binary Ninja (Community Edition)
-wget https://github.com/Vector35/binaryninja-api/releases/download/2.4.2991/BinaryNinjaPersonal-Linux.zip
-unzip BinaryNinjaPersonal-Linux.zip
-sudo mv binaryninja /opt/
-rm BinaryNinjaPersonal-Linux.zip
+sudo apt-get install -y ghidra radare2 x64dbg cutter capstone rizin
 # Frida
-pip install frida-tools
+pip install --user frida-tools
 
 # Web
 sudo apt-get install -y burpsuite nikto w3af sqlmap xsstrike dirbuster wapiti
@@ -25,11 +32,5 @@ sudo apt-get install -y metasploit-framework beef-xss sqlmap nmap john hydra exp
 
 # Miscellaneous
 sudo apt-get install -y wireshark nmap burpsuite john aircrack-ng kismet ettercap
-
-# PostgreSQL 17
-echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" | sudo tee /etc/apt/sources.list.d/pgdg.list
-wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
-sudo apt-get update
-sudo apt-get install -y postgresql-17
 
 echo "Tous les outils gratuits ont été installés avec succès !"
