@@ -1,10 +1,5 @@
 #!/bin/bash
 
-# S'assurer qu'aucune autre instance de apt ou apt-get n'est en cours d'exécution
-if sudo fuser /var/lib/dpkg/lock-frontend ; then
-  echo "Un autre processus utilise apt. Veuillez attendre qu'il se termine ou le terminer manuellement."
-  exit 1
-fi
 
 # Ajouter les dépôts nécessaires et mettre à jour la liste des paquets
 sudo apt-get update
